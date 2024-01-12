@@ -36,7 +36,6 @@ body {
     padding-left: 24px;
     padding-right: 24px;
     padding-top: 56px;
-    background-color: #fb6c6c;
     background-image: url(./img/pokedex-bg.png);
     background-size: 100%;
     color: white;
@@ -83,6 +82,5 @@ body {
 .pokedexBottom img{
     margin-top: -60%;
     height: 60%;
-    filter: brightness(80%) contrast(140%) saturate(160%);
 }
 
