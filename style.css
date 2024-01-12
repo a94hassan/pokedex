@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    font-family: 'Montserrat';
+}
+
+.pokedexTop {
+    box-sizing: border-box;
+    height: 50vh;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 100px;
+    background-color: #fb6c6c;
+    color: white;
+    font-size: 22px;
+    display: flex;
+}
+
+.pokedexTop h1 {
+    margin: 0;
+}
+
+.pokedexBottom {
+    box-sizing: border-box;
+    height: 50vh;
+    margin-top: -32px;
+    padding-left: 24px;
+    padding-right: 24px;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    border-top-right-radius: 32px;
+    border-top-left-radius: 32px;
+}
+
+.pokedexBottom img{
+    margin-top: -200px;
+    height: 240px;
+}
+
