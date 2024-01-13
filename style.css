@@ -125,3 +125,45 @@ body {
     padding-bottom: 10px;
     font-weight: 700;
 }
+
+.home {
+    box-sizing: border-box;
+    height: 90vh;
+    aspect-ratio: 1 / 2.16;
+    border-radius: 32px;
+    background-color: white;
+    padding: 56px 24px;
+}
+
+.home header {
+    padding-bottom: 32px;
+    background-color: white;
+    border-bottom: 1px solid lightgray;
+}
+
+.home h2 {
+    margin: 0;
+}
+
+#pokemonsOverview {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pokemonOverview {
+    width: 140px;
+    background-color: darkblue;
+    color: white;
+}
+
+.pokemonOverview h6 {
+    margin: 0;
+}
+
+.pokemonOverview img {
+    height: 64px;
+}
+
+
