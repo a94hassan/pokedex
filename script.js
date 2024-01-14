@@ -9,23 +9,18 @@ let typeColors = {
     'ghost': '#563B63',
     'dragon': '#44667D',
     'bug': '#ABE06F',
-
     'normal': '#C0C2BC',
     'ice': '#ADCFE2',
     'fighting': '#E5A66E',
     'flying': '#005E7C',
     'psychic': '#D17BE2',
-
     'rock': '#A9A87D'
-
-  
-
 };
 
 let currentPokemonData;
 
 async function loadPokemon() {
-    let url = 'https://pokeapi.co/api/v2/pokemon/6';
+    let url = 'https://pokeapi.co/api/v2/pokemon/1';
     let response = await fetch(url);
     currentPokemonData = await response.json();
     console.log('Loaded pokemon', currentPokemonData);
@@ -165,7 +160,9 @@ function renderOverview(i) {
                     <h6>${capitalizedPokemonName}</h6>
                     ${pokemonTypes}
                 </div>
-                <img src="${pokemonImage}">
+                <div>
+                    <img src="${pokemonImage}">
+                </div>
             </div>
         </div>
     `; 
