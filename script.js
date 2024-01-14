@@ -20,7 +20,8 @@ let typeColors = {
 let currentPokemonData;
 
 async function loadPokemon() {
-    let url = 'https://pokeapi.co/api/v2/pokemon/1';
+    let currentPokemonID = localStorage.getItem('currentPokemonID')
+    let url = `https://pokeapi.co/api/v2/pokemon/${currentPokemonID}`;
     let response = await fetch(url);
     currentPokemonData = await response.json();
     console.log('Loaded pokemon', currentPokemonData);
@@ -133,10 +134,12 @@ function renderPokemonAbilities() {
     }
 }
 
-let numberOfPokemons = 151;
+let numberOfPokemons = 20;
 let pokemonData;
 
 async function loadPokemons() {
+    let pokemonsOverview = document.getElementById('pokemonsOverview');
+    pokemonsOverview.innerHTML = '';
     for (let i = 1; i <= numberOfPokemons; i++) {
       let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
       pokemonData = await response.json();
@@ -153,11 +156,11 @@ function renderOverview(i) {
     let pokemonImage = pokemonData['sprites']['other']['official-artwork']['front_default'];
     let pokemonsOverview = document.getElementById('pokemonsOverview');
     pokemonsOverview.innerHTML += /*html*/`
-        <div class="pokemonOverview" id="pokemonOverview${i}">
-            <h6 class="pokemonIDOverview">${formattedPokemonID}</h6>
+        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openPokedex(${i})">
+            <h5 class="pokemonIDOverview">${formattedPokemonID}</h5>
             <div class="pokemonOverviewBottom">
                 <div>
-                    <h6>${capitalizedPokemonName}</h6>
+                    <h5>${capitalizedPokemonName}</h5>
                     ${pokemonTypes}
                 </div>
                 <div>
@@ -182,4 +185,18 @@ function renderPokemonsTypes(types) {
 function renderPokemonOverviewBGColor(i) {
     let bgColor = typeColors[pokemonData['types'][0]['type']['name']];
     document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
+}
+
+function openPokedex(i) {
+    localStorage.setItem('currentPokemonID', i++)
+    window.location.href = "pokedex.html";
+}
+
+function openHome() {
+    window.location.href = "index.html";
+}
+
+function load20MorePokemons() {
+    numberOfPokemons += 20;
+    loadPokemons();
 }
