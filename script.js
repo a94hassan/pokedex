@@ -1,23 +1,75 @@
-let typeColors = {
-    'fire': '#fb6c6c',
-    'water': '#76bdfe',
-    'grass': '#48d0b0',
-    'electric': '#ffd86f',
-    'ground': '#91746B',
-    'poison': '#C288C1',
-    'fairy': '#F3BFD5',
-    'ghost': '#563B63',
-    'dragon': '#44667D',
-    'bug': '#ABE06F',
-    'normal': '#C0C2BC',
-    'ice': '#ADCFE2',
-    'fighting': '#E5A66E',
-    'flying': '#005E7C',
-    'psychic': '#D17BE2',
-    'rock': '#A9A87D'
-};
-
+let typeColors = {'fire': '#fb6c6c', 'water': '#76bdfe', 'grass': '#48d0b0', 'electric': '#ffd86f', 'ground': '#91746B', 'poison': '#C288C1', 'fairy': '#F3BFD5', 'ghost': '#563B63', 'dragon': '#44667D', 'bug': '#96B659', 'normal': '#C0C2BC', 'ice': '#ADCFE2', 'fighting': '#E5A66E', 'flying': '#005E7C', 'psychic': '#D17BE2', 'rock': '#A9A87D'};
+let numberOfPokemons = 20;
 let currentPokemonData;
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.endsWith("index.html")) {
+        loadPokemons(1, numberOfPokemons);
+    }
+});
+
+async function loadPokemons(startIndex, endIndex) {
+    for (let i = startIndex; i <= endIndex; i++) {
+        let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+        let pokemonData = await response.json();
+        renderOverview(i, pokemonData);
+    }
+}
+function renderOverview(i, pokemonData) {
+    let pokemonID = pokemonData['id'];
+    let formattedPokemonID = "#" + pokemonID.toString().padStart(3, '0');
+    let pokemonName = pokemonData['name'];
+    let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
+    let pokemonTypes = renderPokemonsTypes(pokemonData['types']);
+    let pokemonImage = pokemonData['sprites']['other']['official-artwork']['front_default'];
+    let pokemonsOverview = document.getElementById('pokemonsOverview');
+    pokemonsOverview.innerHTML += /*html*/`
+        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openPokedex(${i})">
+            <h5 class="pokemonIDOverview">${formattedPokemonID}</h5>
+            <div class="pokemonOverviewBottom">
+                <div>
+                    <h5>${capitalizedPokemonName}</h5>
+                    ${pokemonTypes}
+                </div>
+                <div>
+                    <img src="${pokemonImage}">
+                </div>
+            </div>
+        </div>
+    `; 
+    renderPokemonOverviewBGColor(i, pokemonData);
+}
+
+function renderPokemonsTypes(types) {
+    let pokemonTypes = '';
+    for (let i = 0; i < types.length; i++) {
+        let type = types[i]['type']['name'];
+        let capitalizedPokemonType = type.charAt(0).toUpperCase() + type.slice(1);
+        pokemonTypes += `<div class="pokemonTypeOverview">${capitalizedPokemonType}</div>`;
+    }
+    return pokemonTypes;
+}
+
+function renderPokemonOverviewBGColor(i, pokemonData) {
+    let bgColor = typeColors[pokemonData['types'][0]['type']['name']];
+    document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
+}
+
+function openPokedex(i) {
+    localStorage.setItem('currentPokemonID', i++)
+    window.location.href = "pokedex.html";
+}
+
+function openHome() {
+    window.location.href = "index.html";
+}
+
+function load20MorePokemons() {
+    let startIndex = numberOfPokemons + 1;
+    numberOfPokemons += 20;
+    let endIndex = numberOfPokemons;
+    loadPokemons(startIndex, endIndex);
+}
 
 async function loadPokemon() {
     let currentPokemonID = localStorage.getItem('currentPokemonID')
@@ -132,71 +184,4 @@ function renderPokemonAbilities() {
             document.getElementById('pokemonAbilities').innerHTML += ', ';
         }
     }
-}
-
-let numberOfPokemons = 20;
-let pokemonData;
-
-async function loadPokemons() {
-    let pokemonsOverview = document.getElementById('pokemonsOverview');
-    pokemonsOverview.innerHTML = '';
-    for (let i = 1; i <= numberOfPokemons; i++) {
-      let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-      pokemonData = await response.json();
-      renderOverview(i);
-    }
-}
-
-function renderOverview(i) {
-    let pokemonID = pokemonData['id'];
-    let formattedPokemonID = "#" + pokemonID.toString().padStart(3, '0');
-    let pokemonName = pokemonData['name'];
-    let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
-    let pokemonTypes = renderPokemonsTypes(pokemonData['types']);
-    let pokemonImage = pokemonData['sprites']['other']['official-artwork']['front_default'];
-    let pokemonsOverview = document.getElementById('pokemonsOverview');
-    pokemonsOverview.innerHTML += /*html*/`
-        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openPokedex(${i})">
-            <h5 class="pokemonIDOverview">${formattedPokemonID}</h5>
-            <div class="pokemonOverviewBottom">
-                <div>
-                    <h5>${capitalizedPokemonName}</h5>
-                    ${pokemonTypes}
-                </div>
-                <div>
-                    <img src="${pokemonImage}">
-                </div>
-            </div>
-        </div>
-    `; 
-    renderPokemonOverviewBGColor(i);
-}
-
-function renderPokemonsTypes(types) {
-    let pokemonTypes = '';
-    for (let i = 0; i < types.length; i++) {
-        let type = types[i]['type']['name'];
-        let capitalizedPokemonType = type.charAt(0).toUpperCase() + type.slice(1);
-        pokemonTypes += `<div class="pokemonTypeOverview">${capitalizedPokemonType}</div>`;
-    }
-    return pokemonTypes;
-}
-
-function renderPokemonOverviewBGColor(i) {
-    let bgColor = typeColors[pokemonData['types'][0]['type']['name']];
-    document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
-}
-
-function openPokedex(i) {
-    localStorage.setItem('currentPokemonID', i++)
-    window.location.href = "pokedex.html";
-}
-
-function openHome() {
-    window.location.href = "index.html";
-}
-
-function load20MorePokemons() {
-    numberOfPokemons += 20;
-    loadPokemons();
 }
