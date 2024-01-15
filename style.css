@@ -221,6 +221,12 @@ body {
     filter: opacity(30%);
 }
 
+.pokemonStatsNavBar span:hover {
+    cursor: pointer;
+    text-decoration: underline 2px solid;
+    text-underline-offset: 22px;
+}
+
 #pokemonStats {
     width: 100%;
     padding-top: 20px;
@@ -254,4 +260,22 @@ body {
     padding-top: 18px;
     padding-bottom: 10px;
     font-weight: 700;
+}
+
+#pokemonGender {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#pokemonGender div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#pokemonGender img {
+    height: 11px;
+    width: 11px;
+    margin: 0;
 }
