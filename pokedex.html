@@ -22,10 +22,10 @@
         <section class="pokedexBottom">
             <img id="pokemonImage">
             <div class="pokemonStatsNavBar">
-                <span id="about">About</span>
-                <span id="baseStats">Base Stats</span>
-                <span id="evolution">Evolution</span>
-                <span id="moves">Moves</span>
+                <span id="about" onclick="openPokemonStatsTab('about', 'aboutContent')" class="pokemonStatsNavBarHighlight">About</span>
+                <span id="baseStats" onclick="openPokemonStatsTab('baseStats', 'baseStatsContent')">Base Stats</span>
+                <span id="evolution" onclick="openPokemonStatsTab('evolution', 'evolutionContent')">Evolution</span>
+                <span id="moves" onclick="openPokemonStatsTab('moves', 'movesContent')">Moves</span>
             </div>
             <div id="pokemonStats"></div>
             <div></div>

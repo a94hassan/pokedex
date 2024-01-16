@@ -84,7 +84,7 @@ async function loadPokemon() {
     let url = `https://pokeapi.co/api/v2/pokemon/${currentPokemonID}`;
     let response = await fetch(url);
     currentPokemonData = await response.json();
-    console.log('Loaded pokemon', currentPokemonData);
+    console.log('Loaded pokemon', currentPokemonData); // muss noch weg am Ende
     renderPokemonInfo();
 }
 
@@ -129,8 +129,17 @@ function renderPokemonStats() {
     let pokemonStats = document.getElementById('pokemonStats');
     let pokemonHeight = `${calcPokemonHeightInFootAndInch()} (${calcPokemonHeightInMeters()} m)`;
     let pokemonWeight = `${calcPokemonWeightInPounds()} lbs (${calcPokemonWeightInKilogram()} kg)`;
-    pokemonStats.innerHTML = /*html*/`
-        <table id="aboutTable">
+    pokemonStats.innerHTML = generateAboutTabHtml(pokemonHeight, pokemonWeight) + generateBaseStatsTabHtml() + generateEvolutionTabHtml() + generateMovesTabHtml();
+    renderPokemonSpecies();
+    renderPokemonAbilities();
+    renderPokemonGender();
+    renderPokemonEggGroups();
+    renderPokemonEggCycle();
+}
+
+function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
+    return /*html*/`
+        <table id="aboutContent">
             <tr>
                 <td>Species</td>
                 <td id="pokemonSpecies"></td>
@@ -162,11 +171,35 @@ function renderPokemonStats() {
             </tr>
         </table>
     `;
-    renderPokemonSpecies();
-    renderPokemonAbilities();
-    renderPokemonGender();
-    renderPokemonEggGroups();
-    renderPokemonEggCycle();
+}
+
+function generateBaseStatsTabHtml() {
+    return /*html*/`
+        <div id="baseStatsContent" style="display: none">BaseStats</div>
+    `;
+}
+
+function generateEvolutionTabHtml() {
+    return /*html*/`
+        <div id="evolutionContent" style="display: none">Evolution</div>
+    `;    
+}
+
+function generateMovesTabHtml() {
+    return /*html*/`
+        <div id="movesContent" style="display: none">Moves</div>
+    `;    
+}
+
+function openPokemonStatsTab(tabID, contentID) {
+    document.getElementById(tabID).classList.add('pokemonStatsNavBarHighlight');
+    document.getElementById(contentID).style.display = 'unset';
+    ['about', 'baseStats', 'evolution', 'moves'].forEach(tab => {
+        if (tab !== tabID) {
+            document.getElementById(tab).classList.remove('pokemonStatsNavBarHighlight');
+            document.getElementById(tab + 'Content').style.display = 'none';
+        }
+    });
 }
 
 async function renderPokemonSpecies() {
