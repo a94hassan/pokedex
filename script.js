@@ -3,7 +3,7 @@ let numberOfPokemons = 20;
 let currentPokemonData;
 
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.endsWith("index.html")) {
+    if (window.location.pathname.includes("/pokedex/") || window.location.pathname.endsWith("/index.html")) {
         loadPokemons(1, numberOfPokemons);
     }
 });
@@ -135,6 +135,7 @@ function renderPokemonStats() {
     renderPokemonGender();
     renderPokemonEggGroups();
     renderPokemonEggCycle();
+    renderChart();
 }
 
 function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
@@ -174,8 +175,20 @@ function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
 }
 
 function generateBaseStatsTabHtml() {
+    let pokemonName = currentPokemonData['name'];
+    let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
     return /*html*/`
-        <div id="baseStatsContent" style="display: none">BaseStats</div>
+        <div id="baseStatsContent" style="display: none">
+            <div>
+                <canvas id="myChart"></canvas>
+            </div>
+            <table>
+                <th>Type defenses</th>
+                <tr>
+                    <td>The effectiveness of each type on ${capitalizedPokemonName}</td>
+                </tr>
+            </table>
+        </div>
     `;
 }
 
@@ -252,9 +265,9 @@ async function renderPokemonGender() {
     let pokemonGenderMaleRateInPercent = (100 - pokemonGenderFemaleRateInPercent);
     if (pokemonGenderFemaleRate != -1) {
         document.getElementById('pokemonGender').innerHTML = `<div><img src="./img/male_icon.png">${pokemonGenderMaleRateInPercent}%</div><div><img src="./img/female_icon.png">${pokemonGenderFemaleRateInPercent}%</div>`
-    } else [
+    } else {
         document.getElementById('pokemonGender').innerHTML = 'genderless'
-    ]
+    }
 }
 
 async function renderPokemonEggGroups() {
@@ -275,6 +288,99 @@ function renderPokemonEggCycle() {
     document.getElementById('pokemonEggCycle').innerHTML = capitalizedPokemonEggCycle;
 }
 
-function switchStats() {
-    document.getElementById('aboutTable').style = 'display: none;'
+function calcBaseStatsTotal() {
+    let baseStatsTotal = 0;
+    currentPokemonData['stats'].forEach(pokemonBaseStat => {
+        baseStatsTotal += pokemonBaseStat['base_stat'];
+    });
+    return baseStatsTotal;
 }
+
+
+function renderChart() {
+    Chart.defaults.font.family = 'Montserrat';
+    Chart.defaults.font.size = 13;
+    let pokemonBaseStat = currentPokemonData['stats'];
+    let ctx = document.getElementById('myChart');
+    const customScaleFunction = (value, index, values) => {
+        return pokemonBaseStat[index]['base_stat'];
+    };
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed'],
+            datasets: [{
+                data: [pokemonBaseStat[0]['base_stat'], pokemonBaseStat[1]['base_stat'], pokemonBaseStat[2]['base_stat'], pokemonBaseStat[3]['base_stat'], pokemonBaseStat[4]['base_stat'], pokemonBaseStat[5]['base_stat'] ],
+                backgroundColor: [
+                    '#fb6d6d',
+                    '#44be75',
+                    '#fb6d6d',
+                    '#44be75',
+                    '#44be75',
+                    '#fb6d6d'
+                  ],
+                borderWidth: 0,
+                barPercentage: 0.2,
+                borderSkipped: false,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    },
+                    ticks: {
+                        callback: customScaleFunction,
+                        font: {
+                            weight: 600
+                        }
+                    }
+                },
+                y2: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        font: {
+                            family: undefined
+                        }
+                    }
+                }
+            }
+        } 
+    });
+}
+
+
+
+
+
+
+
