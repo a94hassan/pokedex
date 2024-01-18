@@ -1,34 +1,35 @@
-let typeColors = {'fire': '#fb6c6c', 'water': '#76bdfe', 'grass': '#48d0b0', 'electric': '#ffd86f', 'ground': '#91746B', 'poison': '#C288C1', 'fairy': '#F3BFD5', 'ghost': '#563B63', 'dragon': '#44667D', 'bug': '#96B659', 'normal': '#C0C2BC', 'ice': '#ADCFE2', 'fighting': '#E5A66E', 'flying': '#005E7C', 'psychic': '#D17BE2', 'rock': '#A9A87D'};
-let numberOfPokemons = 20;
-let currentPokemonData;
+let typeColors = {'fire': '#fb6c6c', 'water': '#76bdfe', 'grass': '#46C19C', 'electric': '#ffd86f', 'ground': '#91746B', 'poison': '#C288C1', 'fairy': '#F3BFD5', 'ghost': '#563B63', 'dragon': '#44667D', 'bug': '#98c14d', 'normal': '#BBBBBB', 'ice': '#ADCFE2', 'fighting': '#E5A66E', 'flying': '#005E7C', 'psychic': '#D17BE2', 'rock': '#A9A87D', 'dark': '#333333', 'steel': '#B8B8D0'};
+let startNumberOfPokemons = 20;
+let currentIndex = 1;
 
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.includes("/pokedex/") || window.location.pathname.endsWith("/index.html")) {
-        loadPokemons(1, numberOfPokemons);
-    }
-});
 
-async function loadPokemons(startIndex, endIndex) {
-    for (let i = startIndex; i <= endIndex; i++) {
+
+async function fetchData() {
+    for (let i = currentIndex; i < currentIndex + startNumberOfPokemons; i++) {
         let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-        let pokemonData = await response.json();
-        renderOverview(i, pokemonData);
+        let data = await response.json();
+        renderOverview(i, data);
     }
 }
-function renderOverview(i, pokemonData) {
-    let pokemonID = pokemonData['id'];
-    let formattedPokemonID = "#" + pokemonID.toString().padStart(3, '0');
-    let pokemonName = pokemonData['name'];
+
+function renderOverview(i, data) {
+    let formattedPokemonID = "#" + i.toString().padStart(3, '0');
+    let pokemonName = data['name'];
     let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
-    let pokemonTypes = renderPokemonsTypes(pokemonData['types']);
-    let pokemonImage = pokemonData['sprites']['other']['official-artwork']['front_default'];
+    let pokemonTypes = renderPokemonsTypes(data['types']);
+    let pokemonImage = data['sprites']['other']['official-artwork']['front_default'];
     let pokemonsOverview = document.getElementById('pokemonsOverview');
-    pokemonsOverview.innerHTML += /*html*/`
-        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openPokedex(${i})">
+    pokemonsOverview.innerHTML += generatePokemonsOverviewHtml(i, formattedPokemonID, capitalizedPokemonName, pokemonTypes, pokemonImage);
+    renderPokemonOverviewBGColor(i, data);    
+}
+
+function generatePokemonsOverviewHtml(i, formattedPokemonID, capitalizedPokemonName, pokemonTypes, pokemonImage) {
+    return /*html*/`
+        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openDialog(${i})">
             <h5 class="pokemonIDOverview">${formattedPokemonID}</h5>
             <div class="pokemonOverviewBottom">
                 <div>
-                    <h5>${capitalizedPokemonName}</h5>
+                    <h4>${capitalizedPokemonName}</h4>
                     ${pokemonTypes}
                 </div>
                 <div>
@@ -37,7 +38,6 @@ function renderOverview(i, pokemonData) {
             </div>
         </div>
     `; 
-    renderPokemonOverviewBGColor(i, pokemonData);
 }
 
 function renderPokemonsTypes(types) {
@@ -50,25 +50,14 @@ function renderPokemonsTypes(types) {
     return pokemonTypes;
 }
 
-function renderPokemonOverviewBGColor(i, pokemonData) {
-    let bgColor = typeColors[pokemonData['types'][0]['type']['name']];
+function renderPokemonOverviewBGColor(i, data) {
+    let bgColor = typeColors[data['types'][0]['type']['name']];
     document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
 }
 
-function openPokedex(i) {
-    sessionStorage.setItem('currentPokemonID', i++);
-    window.location.href = "pokedex.html";
-}
-
-function openHome() {
-    window.location.href = "index.html";
-}
-
 function load20MorePokemons() {
-    let startIndex = numberOfPokemons + 1;
-    numberOfPokemons += 20;
-    let endIndex = numberOfPokemons;
-    loadPokemons(startIndex, endIndex);
+    currentIndex += 20;    
+    fetchData();
 }
 
 
@@ -79,20 +68,38 @@ function load20MorePokemons() {
 
 
 
-async function loadPokemon() {
-    let currentPokemonID = sessionStorage.getItem('currentPokemonID')
-    let url = `https://pokeapi.co/api/v2/pokemon/${currentPokemonID}`;
-    let response = await fetch(url);
-    currentPokemonData = await response.json();
-    console.log('Loaded pokemon', currentPokemonData); // muss noch weg am Ende
+
+
+async function openDialog(i) {
+    document.getElementById('dialogBG').style = 'display: unset';
+    await fetchPokemonData(i);
+}
+
+function closeDialog() {
+    document.getElementById('dialogBG').style = 'display: none';
+}
+
+
+
+
+let pokemonSpeciesData;
+let pokemonData;
+
+async function fetchPokemonData(i) {
+    let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+    pokemonData = await response.json();
+    let response2 = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${i}`);
+    pokemonSpeciesData = await response2.json();
     renderPokemonInfo();
 }
 
+
+
 function renderPokemonInfo() {
-    let pokemonName = currentPokemonData['name'];
+    let pokemonName = pokemonData['name'];
     let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
-    let pokemonImage = currentPokemonData['sprites']['other']['official-artwork']['front_default'];
-    let pokemonID = currentPokemonData['id'];
+    let pokemonImage = pokemonData['sprites']['other']['official-artwork']['front_default'];
+    let pokemonID = pokemonData['id'];
     let formattedPokemonID = "#" + pokemonID.toString().padStart(3, '0');
     document.getElementById('pokemonName').innerHTML = capitalizedPokemonName;
     document.getElementById('pokemonImage').src = pokemonImage;
@@ -103,8 +110,9 @@ function renderPokemonInfo() {
 }
 
 function renderPokemonTypes() {
-    for (let i = 0; i < currentPokemonData['types'].length; i++) {
-        let pokemonType = currentPokemonData['types'][i]['type']['name'];
+    document.getElementById('pokemonTypes').innerHTML = '';
+    for (let i = 0; i < pokemonData['types'].length; i++) {
+        let pokemonType = pokemonData['types'][i]['type']['name'];
         let capitalizedPokemonType = pokemonType.charAt(0).toUpperCase() + pokemonType.slice(1);
         document.getElementById('pokemonTypes').innerHTML += /*html*/`
             <div class="pokemonType">${capitalizedPokemonType}</div>
@@ -113,16 +121,8 @@ function renderPokemonTypes() {
 }
 
 function renderPokedexBGColor() {
-    let bgColor = typeColors[currentPokemonData['types'][0]['type']['name']];
+    let bgColor = typeColors[pokemonData['types'][0]['type']['name']];
     document.getElementById('pokedexTop').style = `background-color: ${bgColor}`;
-}
-
-async function fetchPokemonData(index) {
-    let currentPokemonID = sessionStorage.getItem('currentPokemonID')
-    let url = `https://pokeapi.co/api/v2/${index}/${currentPokemonID}`;
-    let response = await fetch(url);
-    let pokemonData = await response.json();
-    return pokemonData;
 }
 
 function renderPokemonStats() {
@@ -135,7 +135,7 @@ function renderPokemonStats() {
     renderPokemonGender();
     renderPokemonEggGroups();
     renderPokemonEggCycle();
-    renderChart();
+    renderChart(2);
 }
 
 function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
@@ -175,7 +175,7 @@ function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
 }
 
 function generateBaseStatsTabHtml() {
-    let pokemonName = currentPokemonData['name'];
+    let pokemonName = pokemonData['name'];
     let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
     return /*html*/`
         <div id="baseStatsContent" style="display: none">
@@ -215,52 +215,50 @@ function openPokemonStatsTab(tabID, contentID) {
     });
 }
 
-async function renderPokemonSpecies() {
-    let pokemonData = await fetchPokemonData('pokemon-species');
-    let pokemonSpecies = pokemonData['genera'][7]['genus'];
+function renderPokemonSpecies() {
+    let pokemonSpecies = pokemonSpeciesData['genera'][7]['genus'];
     document.getElementById('pokemonSpecies').innerHTML = pokemonSpecies.replace(" Pokémon", "");
 }
 
 function calcPokemonHeightInMeters() {
-    let pokemonHeight = currentPokemonData['height'];
+    let pokemonHeight = pokemonData['height'];
     let pokemonHeightInCentimeters = pokemonHeight * 10;
     let pokemonHeightInMeters = (pokemonHeightInCentimeters / 100).toFixed(2);
     return pokemonHeightInMeters;
 }
 
 function calcPokemonHeightInFootAndInch() {
-    let foot = Math.floor(calcPokemonHeightInMeters() * 3.28084);
-    let inch = ((calcPokemonHeightInMeters() * 3.28084 - foot) * 12).toFixed(1);
+    let foot = Math.floor(calcPokemonHeightInMeters(pokemonData) * 3.28084);
+    let inch = ((calcPokemonHeightInMeters(pokemonData) * 3.28084 - foot) * 12).toFixed(1);
     let pokemonHeightInFootAndInch = `${foot}'${inch}"`
     return pokemonHeightInFootAndInch;
 }
 
 function calcPokemonWeightInKilogram() {
-    let pokemonWeight = currentPokemonData['weight'];
+    let pokemonWeight = pokemonData['weight'];
     let pokemonWeightInKilogram = pokemonWeight / 10;
     return pokemonWeightInKilogram;
 }
 
 function calcPokemonWeightInPounds() {
     let poundsPerKilogram = 2.20462;
-    let pokemonWeightInPounds = calcPokemonWeightInKilogram() * poundsPerKilogram;
+    let pokemonWeightInPounds = calcPokemonWeightInKilogram(pokemonData) * poundsPerKilogram;
     return pokemonWeightInPounds.toFixed(1);
 }
 
 function renderPokemonAbilities() {
-    for (let i = 0; i < currentPokemonData['abilities'].length; i++) {
-        let pokemonAbility = currentPokemonData['abilities'][i]['ability']['name'];
+    for (let i = 0; i < pokemonData['abilities'].length; i++) {
+        let pokemonAbility = pokemonData['abilities'][i]['ability']['name'];
         let capitalizedPokemonAbility = pokemonAbility.charAt(0).toUpperCase() + pokemonAbility.slice(1);
         document.getElementById('pokemonAbilities').innerHTML += `${capitalizedPokemonAbility} `;
-        if (i < currentPokemonData['abilities'].length - 1) {
+        if (i < pokemonData['abilities'].length - 1) {
             document.getElementById('pokemonAbilities').innerHTML += ', ';
         }
     }
 }
 
-async function renderPokemonGender() {
-    let pokemonData = await fetchPokemonData('pokemon-species');
-    let pokemonGenderFemaleRate = pokemonData['gender_rate'];
+function renderPokemonGender() {
+    let pokemonGenderFemaleRate = pokemonSpeciesData['gender_rate'];
     let pokemonGenderFemaleRateInPercent = ((pokemonGenderFemaleRate / 8) * 100);
     let pokemonGenderMaleRateInPercent = (100 - pokemonGenderFemaleRateInPercent);
     if (pokemonGenderFemaleRate != -1) {
@@ -270,37 +268,27 @@ async function renderPokemonGender() {
     }
 }
 
-async function renderPokemonEggGroups() {
-    let pokemonData = await fetchPokemonData('pokemon-species');
-    for (let i = 0; i < pokemonData['egg_groups'].length; i++) {
-        let pokemonEggGroup = pokemonData['egg_groups'][i]['name']
+function renderPokemonEggGroups() {
+    for (let i = 0; i < pokemonSpeciesData['egg_groups'].length; i++) {
+        let pokemonEggGroup = pokemonSpeciesData['egg_groups'][i]['name']
         let capitalizedPokemonEggGroup = pokemonEggGroup.charAt(0).toUpperCase() + pokemonEggGroup.slice(1);
         document.getElementById('pokemonEggGroups').innerHTML += capitalizedPokemonEggGroup;
-        if (i < pokemonData['egg_groups'].length - 1) {
+        if (i < pokemonSpeciesData['egg_groups'].length - 1) {
             document.getElementById('pokemonEggGroups').innerHTML += ', ';
         }
     }   
 }
 
 function renderPokemonEggCycle() {
-    let pokemonEggCycle = currentPokemonData['types'][0]['type']['name'];
+    let pokemonEggCycle = pokemonData['types'][0]['type']['name'];
     let capitalizedPokemonEggCycle = pokemonEggCycle.charAt(0).toUpperCase() + pokemonEggCycle.slice(1);
     document.getElementById('pokemonEggCycle').innerHTML = capitalizedPokemonEggCycle;
 }
 
-function calcBaseStatsTotal() {
-    let baseStatsTotal = 0;
-    currentPokemonData['stats'].forEach(pokemonBaseStat => {
-        baseStatsTotal += pokemonBaseStat['base_stat'];
-    });
-    return baseStatsTotal;
-}
-
-
 function renderChart() {
     Chart.defaults.font.family = 'Montserrat';
     Chart.defaults.font.size = 13;
-    let pokemonBaseStat = currentPokemonData['stats'];
+    let pokemonBaseStat = pokemonData['stats'];
     let ctx = document.getElementById('myChart');
     const customScaleFunction = (value, index, values) => {
         return pokemonBaseStat[index]['base_stat'];

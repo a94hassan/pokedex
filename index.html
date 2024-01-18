@@ -3,20 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Pokedex</title>
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </head>
-<body onload="loadPokemons()">
-    <div class="home">
-        <header>
-            <h2>Pokedex</h2>
-        </header>
-        <section>
-            <div id="pokemonsOverview"></div>
-            <button onclick="load20MorePokemons()" class="loadMore">Load more</button>
-        </section>
+<body onload="fetchData()">
+    <header>
+        <img src="./img/pokemon_logo.png">
+    </header>
+    <section class="content">
+        <div id="pokemonsOverview"></div>
+        <button onclick="load20MorePokemons()" class="loadMore">Load more</button>
+    </section>
+    <div id="dialogBG" style="display: none">
+        <div class="dialog">
+            <div class="pokedex">
+                <section class="pokedexTop" id="pokedexTop">
+                    <div class="pokedexOptions">
+                        <img src="./img/arrow.png" alt="arrow icon" onclick="closeDialog()">
+                        <img src="./img/heart.png" alt="heart icon" style="display: none;">
+                    </div>
+                    <h1 id="pokemonName"></h1>
+                    <h6 id="pokemonID"></h6>
+                    <div id="pokemonTypes"></div>
+                </section> 
+                <section class="pokedexBottom">
+                    <img id="pokemonImage">
+                    <div class="pokemonStatsNavBar">
+                        <span id="about" onclick="openPokemonStatsTab('about', 'aboutContent')" class="pokemonStatsNavBarHighlight">About</span>
+                        <span id="baseStats" onclick="openPokemonStatsTab('baseStats', 'baseStatsContent')">Base Stats</span>
+                        <span id="evolution" onclick="openPokemonStatsTab('evolution', 'evolutionContent')">Evolution</span>
+                        <span id="moves" onclick="openPokemonStatsTab('moves', 'movesContent')">Moves</span>
+                    </div>
+                    <div id="pokemonStats"></div>
+                    <div></div>
+                </section>
+            </div>
+        </div>
     </div>
 </body>
 </html>
