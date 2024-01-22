@@ -138,7 +138,7 @@ header img {
 .pokedex {
     box-sizing: border-box;
     aspect-ratio: auto 1 / 2.156;
-    max-width: 98vw;
+    max-width: 90vw;
     max-height: 94vh;
     border-radius: 32px;
     background-color: white;
@@ -215,9 +215,38 @@ header img {
     border-top-left-radius: 32px;
 }
 
-.pokedexBottom img {
+.pokedexCenter {
     margin-top: -60%;
     height: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#pokedexArrowLeft {
+    height: 32px;
+    padding: 4px;
+}
+
+#pokedexArrowLeft:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+#pokedexArrowRight {
+    height: 32px;
+    padding: 4px;
+}
+
+#pokedexArrowRight:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+#pokemonImage {
+    height: 100%;
 }
 
 .pokemonStatsNavBar {
@@ -247,14 +276,25 @@ header img {
     width: 100%;
     padding-top: 20px;
     padding-bottom: 20px;
-    overflow-y: scroll;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    overflow-y: auto;
+    scrollbar-width: thin;          
+    scrollbar-color: lightgray white;   
 }
 
 #pokemonStats::-webkit-scrollbar {
-    display: none;
+    width: 12px;               
+  }
+  
+#pokemonStats::-webkit-scrollbar-track {
+    background: white;        
 }
+  
+#pokemonStats::-webkit-scrollbar-thumb {
+    background-color: lightgray;    
+    border-radius: 20px;       
+    border: 3px solid white;  
+}
+
 
 #pokemonStats td {
     font-size: 13px;
@@ -267,6 +307,7 @@ header img {
 #pokemonStats td:nth-child(odd) {
     font-weight: 500;
     filter: opacity(60%);
+    width: 30%;
 }
 
 #pokemonStats td:nth-child(even) {
@@ -276,7 +317,7 @@ header img {
 #pokemonStats th {
     text-align: start;
     font-size: 15px;
-    padding-top: 18px;
+    padding-top: 16px;
     padding-bottom: 10px;
     font-weight: 700;
 }

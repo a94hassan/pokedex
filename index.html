@@ -30,15 +30,19 @@
                     <div id="pokemonTypes"></div>
                 </section> 
                 <section class="pokedexBottom">
-                    <img id="pokemonImage">
+                        <div class="pokedexCenter">
+                            <img src="./img/arrow_left.png" id="pokedexArrowLeft">
+                            <img id="pokemonImage">
+                            <img src="./img/arrow_right.png" id="pokedexArrowRight">
+                        </div>
                     <div class="pokemonStatsNavBar">
                         <span id="about" onclick="openPokemonStatsTab('about', 'aboutContent')" class="pokemonStatsNavBarHighlight">About</span>
+                        <span id="appearance" onclick="openPokemonStatsTab('appearance', 'appearanceContent')">Appearance</span>
+                        <span id="breeding" onclick="openPokemonStatsTab('breeding', 'breedingContent')">Breeding</span>
                         <span id="baseStats" onclick="openPokemonStatsTab('baseStats', 'baseStatsContent')">Base Stats</span>
-                        <span id="evolution" onclick="openPokemonStatsTab('evolution', 'evolutionContent')">Evolution</span>
-                        <span id="moves" onclick="openPokemonStatsTab('moves', 'movesContent')">Moves</span>
+
                     </div>
                     <div id="pokemonStats"></div>
-                    <div></div>
                 </section>
             </div>
         </div>

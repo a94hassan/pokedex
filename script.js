@@ -55,9 +55,9 @@ function renderPokemonOverviewBGColor(i, data) {
     document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
 }
 
-function load20MorePokemons() {
+async function load20MorePokemons() {
     currentIndex += 20;    
-    fetchData();
+    await fetchData();
 }
 
 
@@ -73,6 +73,7 @@ function load20MorePokemons() {
 async function openDialog(i) {
     document.getElementById('dialogBG').style = 'display: unset';
     await fetchPokemonData(i);
+    openPokemonStatsTab('about', 'aboutContent');
 }
 
 function closeDialog() {
@@ -91,7 +92,35 @@ async function fetchPokemonData(i) {
     let response2 = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${i}`);
     pokemonSpeciesData = await response2.json();
     renderPokemonInfo();
+    renderNavigation(i);
 }
+
+function renderNavigation(i) {
+    if (i > 1) {
+        document.getElementById('pokedexArrowLeft').onclick = function() {
+            previousPokemon(i);
+        }
+        document.getElementById('pokedexArrowLeft').style = 'display: unset';
+    } else {
+        document.getElementById('pokedexArrowLeft').style = 'display: none';
+    }
+    document.getElementById('pokedexArrowRight').onclick = function() {
+        nextPokemon(i);
+    }
+}
+
+async function previousPokemon(i) {
+    i--;
+    await fetchPokemonData(i);
+    openPokemonStatsTab('about', 'aboutContent');
+}
+
+async function nextPokemon(i) {
+    i++;
+    await fetchPokemonData(i);
+    openPokemonStatsTab('about', 'aboutContent');
+}
+
 
 
 
@@ -129,18 +158,33 @@ function renderPokemonStats() {
     let pokemonStats = document.getElementById('pokemonStats');
     let pokemonHeight = `${calcPokemonHeightInFootAndInch()} (${calcPokemonHeightInMeters()} m)`;
     let pokemonWeight = `${calcPokemonWeightInPounds()} lbs (${calcPokemonWeightInKilogram()} kg)`;
-    pokemonStats.innerHTML = generateAboutTabHtml(pokemonHeight, pokemonWeight) + generateBaseStatsTabHtml() + generateEvolutionTabHtml() + generateMovesTabHtml();
+    pokemonStats.innerHTML = generateAboutTabHtml() + generateAppearanceTabHtml(pokemonHeight, pokemonWeight) + generateBreedingTabHtml() + generateBaseStatsTabHtml();
     renderPokemonSpecies();
     renderPokemonAbilities();
     renderPokemonGender();
     renderPokemonEggGroups();
-    renderPokemonEggCycle();
-    renderChart(2);
+    renderPokemonHatchTime();
+    renderPokemonLevelingRate();
+    renderChart();
 }
 
-function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
+
+
+
+function generateAboutTabHtml() {
     return /*html*/`
         <table id="aboutContent">
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    `;
+}
+
+function generateAppearanceTabHtml(pokemonHeight, pokemonWeight) {
+    return /*html*/`
+        <table id="appearanceContent" style="display: none">
             <tr>
                 <td>Species</td>
                 <td id="pokemonSpecies"></td>
@@ -157,7 +201,13 @@ function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
                 <td>Abilities</td>
                 <td id="pokemonAbilities"></td>
             </tr>
-            <th>Breeding</th>
+        </table>
+    `;    
+}
+
+function generateBreedingTabHtml() {
+    return /*html*/`
+        <table id="breedingContent" style="display: none">
             <tr>
                 <td>Gender</td>
                 <td id="pokemonGender"></td>
@@ -167,11 +217,15 @@ function generateAboutTabHtml(pokemonHeight, pokemonWeight) {
                 <td id="pokemonEggGroups"></td>
             </tr>
             <tr>
-                <td>Egg Cycle</td>
-                <td id="pokemonEggCycle"></td>
+                <td>Hatch Time</td>
+                <td id="pokemonHatchTime"></td>
+            </tr>
+            <tr>
+                <td>Leveling Rate</td>
+                <td id="pokemonLevelingRate"></td>
             </tr>
         </table>
-    `;
+    `;    
 }
 
 function generateBaseStatsTabHtml() {
@@ -192,22 +246,10 @@ function generateBaseStatsTabHtml() {
     `;
 }
 
-function generateEvolutionTabHtml() {
-    return /*html*/`
-        <div id="evolutionContent" style="display: none">Evolution</div>
-    `;    
-}
-
-function generateMovesTabHtml() {
-    return /*html*/`
-        <div id="movesContent" style="display: none">Moves</div>
-    `;    
-}
-
 function openPokemonStatsTab(tabID, contentID) {
     document.getElementById(tabID).classList.add('pokemonStatsNavBarHighlight');
     document.getElementById(contentID).style.display = 'unset';
-    ['about', 'baseStats', 'evolution', 'moves'].forEach(tab => {
+    ['about', 'baseStats', 'appearance', 'breeding'].forEach(tab => {
         if (tab !== tabID) {
             document.getElementById(tab).classList.remove('pokemonStatsNavBarHighlight');
             document.getElementById(tab + 'Content').style.display = 'none';
@@ -279,10 +321,15 @@ function renderPokemonEggGroups() {
     }   
 }
 
-function renderPokemonEggCycle() {
-    let pokemonEggCycle = pokemonData['types'][0]['type']['name'];
-    let capitalizedPokemonEggCycle = pokemonEggCycle.charAt(0).toUpperCase() + pokemonEggCycle.slice(1);
-    document.getElementById('pokemonEggCycle').innerHTML = capitalizedPokemonEggCycle;
+function renderPokemonHatchTime() {
+    let pokemonHatchTime = pokemonSpeciesData['hatch_counter'];
+    document.getElementById('pokemonHatchTime').innerHTML = pokemonHatchTime + ' Cycles';
+}
+
+function renderPokemonLevelingRate() {
+    let pokemonLevelingRate = pokemonSpeciesData['growth_rate']['name'];
+    let capitalizedPokemonLevelingRate = pokemonLevelingRate.charAt(0).toUpperCase() + pokemonLevelingRate.slice(1);
+    document.getElementById('pokemonLevelingRate').innerHTML = capitalizedPokemonLevelingRate;
 }
 
 function renderChart() {
@@ -365,10 +412,5 @@ function renderChart() {
         } 
     });
 }
-
-
-
-
-
 
 
