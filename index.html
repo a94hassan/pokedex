@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
+    <link rel="icon" type="image/x-icon" href="/img/fav_icon.png">
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="html.js"></script>
+    <script src="chart.js"></script>
     <script src="script.js"></script>
 </head>
 <body onload="fetchData()">
     <header>
         <img src="./img/pokemon_logo.png">
+        <div class="searchBox">
+            <input type="text" id="searchQuery" placeholder="Search...">
+        </div>
     </header>
     <section class="content">
         <div id="pokemonsOverview"></div>
@@ -37,15 +43,17 @@
                         </div>
                     <div class="pokemonStatsNavBar">
                         <span id="about" onclick="openPokemonStatsTab('about', 'aboutContent')" class="pokemonStatsNavBarHighlight">About</span>
-                        <span id="appearance" onclick="openPokemonStatsTab('appearance', 'appearanceContent')">Appearance</span>
-                        <span id="breeding" onclick="openPokemonStatsTab('breeding', 'breedingContent')">Breeding</span>
                         <span id="baseStats" onclick="openPokemonStatsTab('baseStats', 'baseStatsContent')">Base Stats</span>
-
+                        <span id="form" onclick="openPokemonStatsTab('form', 'formContent')">Form</span>
+                        <span id="training" onclick="openPokemonStatsTab('training', 'trainingContent')">Training</span>
                     </div>
                     <div id="pokemonStats"></div>
                 </section>
             </div>
         </div>
     </div>
+    <footer>
+        <span>© 2024 Hassan Ammar</span>
+    </footer>
 </body>
 </html>

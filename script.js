@@ -1,15 +1,22 @@
 let typeColors = {'fire': '#fb6c6c', 'water': '#76bdfe', 'grass': '#46C19C', 'electric': '#ffd86f', 'ground': '#91746B', 'poison': '#C288C1', 'fairy': '#F3BFD5', 'ghost': '#563B63', 'dragon': '#44667D', 'bug': '#98c14d', 'normal': '#BBBBBB', 'ice': '#ADCFE2', 'fighting': '#E5A66E', 'flying': '#005E7C', 'psychic': '#D17BE2', 'rock': '#A9A87D', 'dark': '#333333', 'steel': '#B8B8D0'};
-let startNumberOfPokemons = 20;
-let currentIndex = 1;
-
-
+let shape = {'ball':'./img/shape01.png','squiggle':'./img/shape02.png','fish':'./img/shape03.png','arms':'./img/shape04.png','blob':'./img/shape05.png','upright':'./img/shape06.png','legs':'./img/shape07.png','quadruped':'./img/shape08.png','wings':'./img/shape09.png','tentacles':'./img/shape10.png','heads':'./img/shape11.png','humanoid':'./img/shape12.png','bug-wings':'./img/shape13.png','armor':'./img/shape14.png'};
+let pokemonData;
+let pokemonSpeciesData;
+let startNumberOfPokemons = 40;
+let startIndex = 1;
 
 async function fetchData() {
-    for (let i = currentIndex; i < currentIndex + startNumberOfPokemons; i++) {
+    for (let i = startIndex; i < startIndex + startNumberOfPokemons; i++) {
         let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
         let data = await response.json();
         renderOverview(i, data);
     }
+}
+
+async function load20MorePokemons() {
+    startIndex += startNumberOfPokemons;
+    startNumberOfPokemons = 20;
+    await fetchData();
 }
 
 function renderOverview(i, data) {
@@ -21,23 +28,6 @@ function renderOverview(i, data) {
     let pokemonsOverview = document.getElementById('pokemonsOverview');
     pokemonsOverview.innerHTML += generatePokemonsOverviewHtml(i, formattedPokemonID, capitalizedPokemonName, pokemonTypes, pokemonImage);
     renderPokemonOverviewBGColor(i, data);    
-}
-
-function generatePokemonsOverviewHtml(i, formattedPokemonID, capitalizedPokemonName, pokemonTypes, pokemonImage) {
-    return /*html*/`
-        <div class="pokemonOverview" id="pokemonOverview${i}" onclick="openDialog(${i})">
-            <h5 class="pokemonIDOverview">${formattedPokemonID}</h5>
-            <div class="pokemonOverviewBottom">
-                <div>
-                    <h4>${capitalizedPokemonName}</h4>
-                    ${pokemonTypes}
-                </div>
-                <div>
-                    <img src="${pokemonImage}">
-                </div>
-            </div>
-        </div>
-    `; 
 }
 
 function renderPokemonsTypes(types) {
@@ -55,21 +45,6 @@ function renderPokemonOverviewBGColor(i, data) {
     document.getElementById(`pokemonOverview${i}`).style = `background-color: ${bgColor}`;
 }
 
-async function load20MorePokemons() {
-    currentIndex += 20;    
-    await fetchData();
-}
-
-
-
-
-
-
-
-
-
-
-
 async function openDialog(i) {
     document.getElementById('dialogBG').style = 'display: unset';
     await fetchPokemonData(i);
@@ -80,11 +55,21 @@ function closeDialog() {
     document.getElementById('dialogBG').style = 'display: none';
 }
 
+async function getPokemonBySearch() {
+    let searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+    let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchQuery}`);
+    let data = await response.json();
+    let pokemonID = data['id'];
+    openDialog(pokemonID);
+}
 
-
-
-let pokemonSpeciesData;
-let pokemonData;
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('searchQuery').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            getPokemonBySearch();
+        }
+    });
+})
 
 async function fetchPokemonData(i) {
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
@@ -121,9 +106,6 @@ async function nextPokemon(i) {
     openPokemonStatsTab('about', 'aboutContent');
 }
 
-
-
-
 function renderPokemonInfo() {
     let pokemonName = pokemonData['name'];
     let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
@@ -158,103 +140,105 @@ function renderPokemonStats() {
     let pokemonStats = document.getElementById('pokemonStats');
     let pokemonHeight = `${calcPokemonHeightInFootAndInch()} (${calcPokemonHeightInMeters()} m)`;
     let pokemonWeight = `${calcPokemonWeightInPounds()} lbs (${calcPokemonWeightInKilogram()} kg)`;
-    pokemonStats.innerHTML = generateAboutTabHtml() + generateAppearanceTabHtml(pokemonHeight, pokemonWeight) + generateBreedingTabHtml() + generateBaseStatsTabHtml();
+    pokemonStats.innerHTML = generateAboutTabHtml()+ generateBaseStatsTabHtml() + generateFormTabHtml(pokemonHeight, pokemonWeight) + generateTrainingTabHtml();
+    renderChart();
+    aboutTabRendering();
+    formTabRendering();
+    trainingTabRendering();
+}
+
+function aboutTabRendering() {
+    renderPokemonFlavorText();
+    renderPokemonAboutName();
+    renderPokemonAboutID();
+    renderPokemonAboutType();
+    renderPokemonAboutHabitat();
+    renderPokemonPokedexColor();
+}
+
+function formTabRendering() {
     renderPokemonSpecies();
     renderPokemonAbilities();
+    renderPokemonShape();
+    renderPokemonShiny();
+}
+
+function trainingTabRendering() {
     renderPokemonGender();
     renderPokemonEggGroups();
     renderPokemonHatchTime();
+    renderPokemonFriendship();
     renderPokemonLevelingRate();
-    renderChart();
-}
-
-
-
-
-function generateAboutTabHtml() {
-    return /*html*/`
-        <table id="aboutContent">
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-    `;
-}
-
-function generateAppearanceTabHtml(pokemonHeight, pokemonWeight) {
-    return /*html*/`
-        <table id="appearanceContent" style="display: none">
-            <tr>
-                <td>Species</td>
-                <td id="pokemonSpecies"></td>
-            </tr>
-            <tr>
-                <td>Height</td>
-                <td>${pokemonHeight}</td>
-            </tr>
-            <tr>
-                <td>Weight</td>
-                <td>${pokemonWeight}</td>
-            </tr>
-            <tr>
-                <td>Abilities</td>
-                <td id="pokemonAbilities"></td>
-            </tr>
-        </table>
-    `;    
-}
-
-function generateBreedingTabHtml() {
-    return /*html*/`
-        <table id="breedingContent" style="display: none">
-            <tr>
-                <td>Gender</td>
-                <td id="pokemonGender"></td>
-            </tr>
-            <tr>
-                <td>Egg Groups</td>
-                <td id="pokemonEggGroups"></td>
-            </tr>
-            <tr>
-                <td>Hatch Time</td>
-                <td id="pokemonHatchTime"></td>
-            </tr>
-            <tr>
-                <td>Leveling Rate</td>
-                <td id="pokemonLevelingRate"></td>
-            </tr>
-        </table>
-    `;    
-}
-
-function generateBaseStatsTabHtml() {
-    let pokemonName = pokemonData['name'];
-    let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
-    return /*html*/`
-        <div id="baseStatsContent" style="display: none">
-            <div>
-                <canvas id="myChart"></canvas>
-            </div>
-            <table>
-                <th>Type defenses</th>
-                <tr>
-                    <td>The effectiveness of each type on ${capitalizedPokemonName}</td>
-                </tr>
-            </table>
-        </div>
-    `;
+    renderPokemonExperience();
+    renderPokemonCatchRate();
 }
 
 function openPokemonStatsTab(tabID, contentID) {
     document.getElementById(tabID).classList.add('pokemonStatsNavBarHighlight');
     document.getElementById(contentID).style.display = 'unset';
-    ['about', 'baseStats', 'appearance', 'breeding'].forEach(tab => {
+    ['about', 'baseStats', 'form', 'training'].forEach(tab => {
         if (tab !== tabID) {
             document.getElementById(tab).classList.remove('pokemonStatsNavBarHighlight');
             document.getElementById(tab + 'Content').style.display = 'none';
         }
     });
+}
+
+function renderPokemonFlavorText() {
+    for (let i = 0; i < pokemonSpeciesData['flavor_text_entries'].length; i++) {
+        let pokemonFlavorTextData = pokemonSpeciesData['flavor_text_entries'][i];
+        if (pokemonFlavorTextData['language']['name'] == 'en') {
+            let pokemonFlavorText = pokemonSpeciesData['flavor_text_entries'][i]['flavor_text'];
+            document.getElementById('pokemonFlavorText').innerHTML = pokemonFlavorText;
+        }
+    }
+}
+
+function renderPokemonAboutName() {
+    let pokemonName = pokemonData['name'];
+    let capitalizedPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
+    document.getElementById('pokemonAboutName').innerHTML = capitalizedPokemonName;
+}
+
+function renderPokemonAboutID() {
+    let pokemonID = pokemonData['id'];
+    document.getElementById('pokemonAboutID').innerHTML = pokemonID;
+}
+
+function renderPokemonAboutType() {
+    document.getElementById('pokemonAboutType').innerHTML = '';
+    for (let i = 0; i < pokemonData['types'].length; i++) {
+        let pokemonType = pokemonData['types'][i]['type']['name'];
+        let capitalizedPokemonType = pokemonType.charAt(0).toUpperCase() + pokemonType.slice(1);
+        document.getElementById('pokemonAboutType').innerHTML += capitalizedPokemonType;
+        if (i < pokemonData['types'].length - 1) {
+            document.getElementById('pokemonAboutType').innerHTML += ', ';
+        }
+    }
+}
+
+function renderPokemonAboutHabitat() {
+    let pokemonHabitat = pokemonSpeciesData['habitat']['name'];
+    let capitalizedPokemonHabitat = pokemonHabitat.charAt(0).toUpperCase() + pokemonHabitat.slice(1);
+    document.getElementById('pokemonAboutHabitat').innerHTML = capitalizedPokemonHabitat;
+}
+
+function renderPokemonPokedexColor() {
+    let pokemonPokedexColor = pokemonSpeciesData['color']['name'];
+    let capitalizedPokemonPokedexColor = pokemonPokedexColor.charAt(0).toUpperCase() + pokemonPokedexColor.slice(1);
+    document.getElementById('pokemonAboutPokedexColor').innerHTML = /*html*/`
+    <div id="pokedexColor"></div>${capitalizedPokemonPokedexColor}
+    `;
+    document.getElementById('pokedexColor').style = `background-color: ${pokemonPokedexColor}`;
+}
+
+function renderPokemonShape() {
+    let pokemonShape = pokemonSpeciesData['shape']['name'];
+    let capitalizedPokemonShape = pokemonShape.charAt(0).toUpperCase() + pokemonShape.slice(1);
+    let pokemonShapeImage = shape[pokemonSpeciesData['shape']['name']];
+    document.getElementById('pokemonShape').innerHTML = /*html*/`
+        ${capitalizedPokemonShape} <img src="${pokemonShapeImage}">
+        `;
 }
 
 function renderPokemonSpecies() {
@@ -299,6 +283,11 @@ function renderPokemonAbilities() {
     }
 }
 
+function renderPokemonShiny() {
+    let pokemonShinyImage = pokemonData['sprites']['other']['official-artwork']['front_shiny'];
+    document.getElementById('pokemonShiny').innerHTML = `<img src = ${pokemonShinyImage}>`;
+}
+
 function renderPokemonGender() {
     let pokemonGenderFemaleRate = pokemonSpeciesData['gender_rate'];
     let pokemonGenderFemaleRateInPercent = ((pokemonGenderFemaleRate / 8) * 100);
@@ -332,85 +321,17 @@ function renderPokemonLevelingRate() {
     document.getElementById('pokemonLevelingRate').innerHTML = capitalizedPokemonLevelingRate;
 }
 
-function renderChart() {
-    Chart.defaults.font.family = 'Montserrat';
-    Chart.defaults.font.size = 13;
-    let pokemonBaseStat = pokemonData['stats'];
-    let ctx = document.getElementById('myChart');
-    const customScaleFunction = (value, index, values) => {
-        return pokemonBaseStat[index]['base_stat'];
-    };
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed'],
-            datasets: [{
-                data: [pokemonBaseStat[0]['base_stat'], pokemonBaseStat[1]['base_stat'], pokemonBaseStat[2]['base_stat'], pokemonBaseStat[3]['base_stat'], pokemonBaseStat[4]['base_stat'], pokemonBaseStat[5]['base_stat'] ],
-                backgroundColor: [
-                    '#fb6d6d',
-                    '#44be75',
-                    '#fb6d6d',
-                    '#44be75',
-                    '#44be75',
-                    '#fb6d6d'
-                  ],
-                borderWidth: 0,
-                barPercentage: 0.2,
-                borderSkipped: false,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    border: {
-                        display: false
-                    },
-                    ticks: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        display: false
-                    },
-                    border: {
-                        display: false
-                    },
-                    ticks: {
-                        callback: customScaleFunction,
-                        font: {
-                            weight: 600
-                        }
-                    }
-                },
-                y2: {
-                    beginAtZero: true,
-                    grid: {
-                        display: false
-                    },
-                    border: {
-                        display: false
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false,
-                    labels: {
-                        font: {
-                            family: undefined
-                        }
-                    }
-                }
-            }
-        } 
-    });
+function renderPokemonFriendship() {
+    let pokemonFriendship = pokemonSpeciesData['base_happiness'];
+    document.getElementById('pokemonFriendship').innerHTML = pokemonFriendship;
 }
 
+function renderPokemonExperience() {
+    let pokemonExperience = pokemonData['base_experience'];
+    document.getElementById('pokemonExperience').innerHTML = pokemonExperience;
+}
 
+function renderPokemonCatchRate() {
+    let pokemonCatchRate = pokemonSpeciesData['capture_rate'];
+    document.getElementById('pokemonCatchRate').innerHTML = pokemonCatchRate;
+}
