@@ -14,9 +14,11 @@ async function fetchData() {
 }
 
 async function load20MorePokemons() {
+    document.getElementById('loadMore').disabled = true;
     startIndex += startNumberOfPokemons;
     startNumberOfPokemons = 20;
     await fetchData();
+    document.getElementById('loadMore').disabled = false;
 }
 
 function renderOverview(i, data) {
@@ -57,19 +59,42 @@ function closeDialog() {
 
 async function getPokemonBySearch() {
     let searchQuery = document.getElementById('searchQuery').value.toLowerCase();
-    let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchQuery}`);
-    let data = await response.json();
-    let pokemonID = data['id'];
-    openDialog(pokemonID);
+    try {
+        let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchQuery}`);
+        if (!response.ok) {
+            throw new Error('Pokémon nicht gefunden.');
+        }
+        let data = await response.json();
+        let pokemonID = data['id'];
+        openDialog(pokemonID);
+    } catch (error) {
+        if (error.message === 'Pokémon nicht gefunden.') {
+            alert('Bitte gebe einen vollständigen Pokémon-Namen ein.');
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('searchQuery').addEventListener('keydown', (event) => {
+    let searchQuery = document.getElementById('searchQuery');
+    searchQuery.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            getPokemonBySearch();
+            if(searchQuery.value.length === 0) {
+                alert('Bitte gebe einen vollständigen Pokémon-Namen ein.')
+            } else {
+                getPokemonBySearch();
+            }
         }
     });
 })
+
+function search() {
+    let searchQuery = document.getElementById('searchQuery');
+    if(searchQuery.value.length === 0) {
+        alert('Bitte gebe einen vollständigen Pokémon-Namen ein.')
+    } else {
+        getPokemonBySearch();
+    }
+}
 
 async function fetchPokemonData(i) {
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);

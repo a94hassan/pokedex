@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
-    <link rel="icon" type="image/x-icon" href="/img/fav_icon.png">
+    <link rel="icon" type="image/x-icon" href="./img/fav_icon.png">
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,11 +17,12 @@
         <img src="./img/pokemon_logo.png">
         <div class="searchBox">
             <input type="text" id="searchQuery" placeholder="Search...">
+            <button onclick="search()"></button>
         </div>
     </header>
     <section class="content">
         <div id="pokemonsOverview"></div>
-        <button onclick="load20MorePokemons()" class="loadMore">Load more</button>
+        <button onclick="load20MorePokemons()" id="loadMore">Load more</button>
     </section>
     <div id="dialogBG" style="display: none">
         <div class="dialog">
