@@ -8,7 +8,7 @@ function generatePokemonsOverviewHtml(i, formattedPokemonID, capitalizedPokemonN
                     ${pokemonTypes}
                 </div>
                 <div>
-                    <img src="${pokemonImage}">
+                    <img src="${pokemonImage}" loading="lazy">
                 </div>
             </div>
         </div>
